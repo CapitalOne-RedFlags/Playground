@@ -20,26 +20,7 @@ func ProcessRecords(messages []events.SQSMessage) []domain.Transaction {
 
 		fmt.Printf("Processing Transaction: ID=%s, Amount=%.2f\n", txn.Id, txn.Amount)
 		transactions = append(transactions, txn)
-
-		// Delete the message after processing
-		// deleteMessage(sqsClient, queueURL, *msg.ReceiptHandle)
 	}
 
 	return transactions
 }
-
-// deleteMessage removes a processed message from the queue.
-// func deleteMessage(sqsClient *sqs.Client, queueURL, receiptHandle string) {
-// 	input := &sqs.DeleteMessageInput{
-// 		QueueUrl:      aws.String(queueURL),
-// 		ReceiptHandle: aws.String(receiptHandle),
-// 	}
-
-// 	_, err := sqsClient.DeleteMessage(context.TODO(), input)
-// 	if err != nil {
-// 		log.Printf("Error deleting message: %v", err)
-// 		return
-// 	}
-
-// 	log.Println("Message deleted from SQS")
-// }
