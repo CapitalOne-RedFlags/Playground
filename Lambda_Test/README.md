@@ -33,7 +33,7 @@ This Go project demonstrates how to consume **AWS SQS** messages using **AWS Lam
 
 ## How to Run the Project
 
-### **1 Create AWS SQS Queue
+### **1: Create AWS SQS Queue**
 ```
 aws sqs create-queue --queue-name TransactionQueue
 ```
@@ -46,21 +46,22 @@ export SQS_QUEUE_NAME="YourQueueName"
 
 ---
 
-### **2 Create IAM Role to Allow Lambda to Read from SQS
+### **2: Create IAM Role to Allow Lambda to Read from SQS**
 In **AWS IAM**, create a new role that includes permissions **AWSLambdaSQSQueueExecutionRole**
 
 ---
 
-### **3 Create AWS Lambda Function
+### **3: Create AWS Lambda Function**
 In the AWS Lambda Dashboard, go to **Create a Function**
 For Function name, put LambdaTest
 For **Runtime**, choose **Amazon Linux 2023**
 For **Architecture**, choose **x86_64**
 For **Change default execution role**, choose **Use an existing role**, and select the IAM role you created in step 2
 Click **Create function**
+
 ---
 
-### **4 Add SQS Trigger
+### **4: Add SQS Trigger**
 Click on your function in the AWS Lambda Dashboard
 If **SQS** is not yet listed as a trigger, click **Add Trigger** and select **SQS** from the dropdown
 Select **TransactionQueue** as the **SQSQueue**
@@ -76,7 +77,7 @@ go mod tidy
 
 ---
 
-### **6 Deploy Function Code to Lambda
+### **6 Deploy Function Code to Lambda**
 Run the following command to compile the code, zip the executable, and upload the zipfile to Lambda 
 
 ```sh
@@ -86,7 +87,7 @@ make deploy
 ---
 
 ### Running the Function
-In **AWS SQS**, navigate to the Queue you created and click **send or receive message**
+In **AWS SQS**, navigate to the queue you created and click **send or receive message**
 Send a transaction of the form
 ```json
 {"transaction_id": "1", "amount": 100.00}
