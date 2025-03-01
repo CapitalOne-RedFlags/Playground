@@ -10,6 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
+// Copied from SQS_Test
+
 // CreateQueue ensures the queue exists and returns its URL.
 func CreateQueue(queueName string) (string, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO())

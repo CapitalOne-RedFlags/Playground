@@ -8,6 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
+// Copied from SQS_Test
+
 // NewSQSClient initializes and returns an SQS client.
 func NewSQSClient() *sqs.Client {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
