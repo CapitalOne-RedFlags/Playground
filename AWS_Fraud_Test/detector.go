@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -53,6 +54,7 @@ func CreateLabels(client *frauddetector.Client) {
 }
 
 // CreateEventVariables creates the necessary event variables before creating the event type
+// or skips them if they already exist
 func CreateEventVariables(client *frauddetector.Client) error {
 	variables := []struct {
 		name         string
@@ -66,47 +68,64 @@ func CreateEventVariables(client *frauddetector.Client) error {
 			dataType:     types.DataTypeString,
 			defaultValue: "",
 			description:  "IP address of the user",
-			variableType: "IP_ADDRESS", // Use valid variable type
+			variableType: "IP_ADDRESS",
 		},
 		{
 			name:         "transaction_amount",
 			dataType:     types.DataTypeFloat,
 			defaultValue: "0.0",
 			description:  "Amount of the transaction",
-			variableType: "NUMERIC", // Use valid variable type for amounts
+			variableType: "NUMERIC",
 		},
 		{
 			name:         "email_address",
 			dataType:     types.DataTypeString,
 			defaultValue: "",
 			description:  "Email address of the user",
-			variableType: "EMAIL_ADDRESS", // Use valid variable type
+			variableType: "EMAIL_ADDRESS",
 		},
 	}
 
-	successCount := 0
 	for _, v := range variables {
-		_, err := client.CreateVariable(context.TODO(), &frauddetector.CreateVariableInput{
-			Name:         aws.String(v.name),
+		// First check if the variable already exists
+		variableName := aws.String(v.name)
+
+		// Get the variable to see if it exists
+		_, err := client.GetVariables(context.TODO(), &frauddetector.GetVariablesInput{
+			Name: variableName,
+		})
+
+		if err == nil {
+			// Variable exists, skip creation
+			fmt.Printf("Variable %s already exists, skipping creation.\n", v.name)
+			continue
+		}
+
+		// Check if error is something other than "variable not found"
+		var resourceNotFoundException *types.ResourceNotFoundException
+		if !errors.As(err, &resourceNotFoundException) {
+			log.Printf("Error checking if variable %s exists: %v", v.name, err)
+			continue
+		}
+
+		// Variable doesn't exist, create it
+		_, err = client.CreateVariable(context.TODO(), &frauddetector.CreateVariableInput{
+			Name:         variableName,
 			DataType:     v.dataType,
 			DefaultValue: aws.String(v.defaultValue),
 			Description:  aws.String(v.description),
 			VariableType: aws.String(v.variableType),
 			DataSource:   types.DataSourceEvent,
 		})
+
 		if err != nil {
 			log.Printf("Failed to create variable %s: %v", v.name, err)
-			// Continue with the next variables even if one fails
 			continue
 		}
+
 		fmt.Printf("Variable %s created successfully.\n", v.name)
-		successCount++
 	}
 
-	if successCount < len(variables) {
-		return fmt.Errorf("failed to create all variables, only %d of %d were successful",
-			successCount, len(variables))
-	}
 	return nil
 }
 

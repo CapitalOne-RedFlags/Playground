@@ -31,7 +31,7 @@ func TrainModel(client *frauddetector.Client) {
 		},
 		// Add ExternalEventsDetail field which is required when using EXTERNAL_EVENTS
 		ExternalEventsDetail: &types.ExternalEventsDetail{
-			DataAccessRoleArn: aws.String("arn:aws:iam::YOUR_ACCOUNT_ID:role/service-role/AmazonFraudDetectorRole"),
+			DataAccessRoleArn: aws.String("arn:aws:iam::920373029279:role/service-role/AmazonFraudDetectorRole"),
 			DataLocation:      aws.String("s3://redflags-bucket/bank_transactions_data.csv"),
 			// EventType:         aws.String("transaction_event"),
 		},
