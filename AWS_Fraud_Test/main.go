@@ -2,12 +2,18 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/aws/aws-sdk-go-v2/service/frauddetector"
 )
 
 func main() {
 	fmt.Println("Starting AWS Fraud Detector Setup...")
 
-	client := GetAWSConfig()
+	// Get the AWS configuration
+	cfg := GetAWSConfig()
+
+	// Create a Fraud Detector client from the config
+	client := frauddetector.NewFromConfig(cfg)
 
 	// Step 1: Set up entity types and event types
 	CreateEntityType(client)
@@ -17,7 +23,7 @@ func main() {
 	CreateDetector(client)
 
 	// Step 3: Upload dataset to S3
-	UploadToS3("your-bucket-name", "fraud_data.csv", "fraud_data.csv")
+	UploadToS3("your-bucket-name", "fraud_data.csv", "fraud_data.csv") // todos
 
 	// Step 4: Create and train the Fraud Detector model
 	CreateModel(client)

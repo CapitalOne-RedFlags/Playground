@@ -25,12 +25,12 @@ func CreateEntityType(client *frauddetector.Client) {
 func CreateEventType(client *frauddetector.Client) {
 	_, err := client.PutEventType(context.TODO(), &frauddetector.PutEventTypeInput{
 		Name: aws.String("transaction_event"),
-		EntityTypes: []frauddetector.EntityType{
-			{Name: aws.String("customer")},
+		EntityTypes: []string{ // ✅ Use string slice
+			"customer",
 		},
-		EventVariables: []frauddetector.EventVariable{
-			{Name: aws.String("ip_address")}, // todo add necessary event variables
-			{Name: aws.String("transaction_amount")},
+		EventVariables: []string{ // ✅ Use string slice
+			"ip_address",
+			"transaction_amount",
 		},
 	})
 	if err != nil {

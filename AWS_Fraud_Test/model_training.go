@@ -7,18 +7,28 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/frauddetector"
+	"github.com/aws/aws-sdk-go-v2/service/frauddetector/types"
 )
 
 // TrainModel starts model training.
 func TrainModel(client *frauddetector.Client) {
 	modelID := "fraud_model"
 
+	dataSource := types.TrainingDataSourceEnumExternalEvents
+
 	_, err := client.CreateModelVersion(context.TODO(), &frauddetector.CreateModelVersionInput{
 		ModelId:            aws.String(modelID),
-		ModelType:          frauddetector.ModelTypeOnlineFraudInsights,
-		TrainingDataSource: aws.String("S3"),
-		TrainingDataSchema: &frauddetector.TrainingDataSchema{
-			TargetAttributeName: aws.String("IS_FRAUD"),
+		ModelType:          types.ModelTypeEnumTransactionFraudInsights,
+		TrainingDataSource: dataSource,
+		TrainingDataSchema: &types.TrainingDataSchema{
+			LabelSchema: &types.LabelSchema{
+				// Correct type for LabelMapper
+				LabelMapper: map[string][]string{
+					"fraud": {"1"},
+					"legit": {"0"},
+				},
+			},
+			ModelVariables: []string{"ip_address", "email_address", "transaction_amount"},
 		},
 	})
 	if err != nil {

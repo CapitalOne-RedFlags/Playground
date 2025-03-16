@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/frauddetector"
+	"github.com/aws/aws-sdk-go-v2/service/frauddetector/types"
 )
 
 // ActivateModel deploys and activates the model.
@@ -16,9 +17,9 @@ func ActivateModel(client *frauddetector.Client) {
 
 	_, err := client.UpdateModelVersionStatus(context.TODO(), &frauddetector.UpdateModelVersionStatusInput{
 		ModelId:            aws.String(modelID),
-		ModelType:          frauddetector.ModelTypeOnlineFraudInsights,
+		ModelType:          types.ModelTypeEnumTransactionFraudInsights,
 		ModelVersionNumber: aws.String(modelVersion),
-		Status:             frauddetector.ModelVersionStatusActive,
+		Status:             types.ModelVersionStatusActive,
 	})
 	if err != nil {
 		log.Fatalf("Failed to activate model: %v", err)

@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/aws/aws-sdk-go-v2/service/frauddetector"
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/frauddetector"
+	"github.com/aws/aws-sdk-go-v2/service/frauddetector/types"
 )
 
 // SendFraudEvent sends an event to AWS Fraud Detector.
@@ -14,9 +15,11 @@ func SendFraudEvent(client *frauddetector.Client) {
 	_, err := client.SendEvent(context.TODO(), &frauddetector.SendEventInput{
 		EventId:       aws.String("event123"),
 		EventTypeName: aws.String("transaction_event"),
-		DetectorId:    aws.String("transaction_detector"),
-		Entities: []frauddetector.Entity{
-			{Name: aws.String("customer"), EntityId: aws.String("cust123")},
+		Entities: []types.Entity{
+			{
+				EntityType: aws.String("customer"),
+				EntityId:   aws.String("cust123"),
+			},
 		},
 		EventTimestamp: aws.String("2025-03-09T12:00:00Z"),
 		EventVariables: map[string]string{
