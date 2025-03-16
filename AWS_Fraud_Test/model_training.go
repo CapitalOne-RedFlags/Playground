@@ -22,13 +22,18 @@ func TrainModel(client *frauddetector.Client) {
 		TrainingDataSource: dataSource,
 		TrainingDataSchema: &types.TrainingDataSchema{
 			LabelSchema: &types.LabelSchema{
-				// Correct type for LabelMapper
 				LabelMapper: map[string][]string{
 					"fraud": {"1"},
 					"legit": {"0"},
 				},
 			},
 			ModelVariables: []string{"ip_address", "email_address", "transaction_amount"},
+		},
+		// Add ExternalEventsDetail field which is required when using EXTERNAL_EVENTS
+		ExternalEventsDetail: &types.ExternalEventsDetail{
+			DataAccessRoleArn: aws.String("arn:aws:iam::YOUR_ACCOUNT_ID:role/service-role/AmazonFraudDetectorRole"),
+			DataLocation:      aws.String("s3://redflags-bucket/bank_transactions_data.csv"),
+			// EventType:         aws.String("transaction_event"),
 		},
 	})
 	if err != nil {
