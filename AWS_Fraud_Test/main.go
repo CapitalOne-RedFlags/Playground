@@ -23,7 +23,7 @@ func main() {
 	CreateDetector(client)
 
 	// Step 3: Upload dataset to S3
-	UploadToS3("your-bucket-name", "fraud_data.csv", "fraud_data.csv") // todos
+	UploadToS3("redflags-bucket", "bank_transactions_data.csv", "bank_transactions_data.csv") // todos
 
 	// Step 4: Create and train the Fraud Detector model
 	CreateModel(client)
