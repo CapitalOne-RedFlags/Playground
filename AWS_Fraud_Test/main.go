@@ -15,8 +15,10 @@ func main() {
 	// Create a Fraud Detector client from the config
 	client := frauddetector.NewFromConfig(cfg)
 
-	// Step 1: Set up entity types and event types
+	// Step 1: Set up entity types and event types and labels
 	CreateEntityType(client)
+	CreateLabels(client)
+	CreateEventVariables(client)
 	CreateEventType(client)
 
 	// Step 2: Create the fraud detector
