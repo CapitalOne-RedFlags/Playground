@@ -14,27 +14,21 @@ import (
 func TrainModel(client *frauddetector.Client) {
 	modelID := "fraud_model"
 
-	dataSource := types.TrainingDataSourceEnumExternalEvents
-
 	_, err := client.CreateModelVersion(context.TODO(), &frauddetector.CreateModelVersionInput{
 		ModelId:            aws.String(modelID),
 		ModelType:          types.ModelTypeEnumTransactionFraudInsights,
-		TrainingDataSource: dataSource,
+		TrainingDataSource: types.TrainingDataSourceEnumIngestedEvents,
 		TrainingDataSchema: &types.TrainingDataSchema{
 			LabelSchema: &types.LabelSchema{
 				LabelMapper: map[string][]string{
-					"fraud": {"1"},
-					"legit": {"0"},
+					"FRAUD": {"1"},
+					"LEGIT": {"0"},
 				},
+				UnlabeledEventsTreatment: types.UnlabeledEventsTreatmentIgnore, // Move inside LabelSchema
 			},
 			ModelVariables: []string{"ip_address", "email_address", "transaction_amount"},
 		},
-		// Add ExternalEventsDetail field which is required when using EXTERNAL_EVENTS
-		ExternalEventsDetail: &types.ExternalEventsDetail{
-			DataAccessRoleArn: aws.String("arn:aws:iam::920373029279:role/service-role/AmazonFraudDetectorRole"),
-			DataLocation:      aws.String("s3://redflags-bucket/bank_transactions_data.csv"),
-			// EventType:         aws.String("transaction_event"),
-		},
+		// UnlabeledEventsTreatmentEnum: types.UnlabeledEventsTreatmentIgnore, // ✅ Required when using INGESTED_EVENTS
 	})
 	if err != nil {
 		log.Fatalf("Failed to train model: %v", err)
