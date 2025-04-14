@@ -4,7 +4,10 @@ go 1.22
 
 toolchain go1.23.7
 
-require github.com/aws/aws-sdk-go-v2/config v1.29.9
+require (
+	github.com/aws/aws-sdk-go-v2/config v1.29.9
+	github.com/google/uuid v1.6.0
+)
 
 require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.10 // indirect

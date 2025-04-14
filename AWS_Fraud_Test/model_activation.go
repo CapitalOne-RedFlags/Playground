@@ -10,19 +10,37 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/frauddetector/types"
 )
 
-// ActivateModel deploys and activates the model.
+// ActivateModel deploys and activates the model if it's in TRAINING_COMPLETE status.
 func ActivateModel(client *frauddetector.Client) {
 	modelID := "fraud_model"
 	modelVersion := "1.0"
 
-	_, err := client.UpdateModelVersionStatus(context.TODO(), &frauddetector.UpdateModelVersionStatusInput{
+	// Check model version status
+	statusResp, err := client.GetModelVersion(context.TODO(), &frauddetector.GetModelVersionInput{
 		ModelId:            aws.String(modelID),
-		ModelType:          types.ModelTypeEnumTransactionFraudInsights,
 		ModelVersionNumber: aws.String(modelVersion),
-		Status:             types.ModelVersionStatusActive,
+		ModelType:          types.ModelTypeEnumTransactionFraudInsights,
 	})
 	if err != nil {
-		log.Fatalf("Failed to activate model: %v", err)
+		log.Fatalf("Failed to get model version: %v", err)
 	}
-	fmt.Println("Model activated successfully.")
+
+	// Print out the status to understand what you're receiving
+	fmt.Printf("Model status: %v\n", statusResp.Status)
+
+	// Only activate if status is TRAINING_COMPLETE
+	if statusResp.Status == aws.String("TRAINING_COMPLETE") {
+		_, err = client.UpdateModelVersionStatus(context.TODO(), &frauddetector.UpdateModelVersionStatusInput{
+			ModelId:            aws.String(modelID),
+			ModelType:          types.ModelTypeEnumTransactionFraudInsights,
+			ModelVersionNumber: aws.String(modelVersion),
+			Status:             types.ModelVersionStatusActive,
+		})
+		if err != nil {
+			log.Fatalf("Failed to activate model: %v", err)
+		}
+		fmt.Println("Model activated successfully.")
+	} else {
+		fmt.Printf("Model is not in 'TRAINING_COMPLETE' status, current status: %v\n", statusResp.Status)
+	}
 }

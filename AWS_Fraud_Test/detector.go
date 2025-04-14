@@ -30,11 +30,11 @@ func CreateLabels(client *frauddetector.Client) {
 		description string
 	}{
 		{
-			name:        "fraud",
+			name:        "1",
 			description: "Fraudulent transaction",
 		},
 		{
-			name:        "legit",
+			name:        "0",
 			description: "Legitimate transaction",
 		},
 	}
@@ -63,27 +63,140 @@ func CreateEventVariables(client *frauddetector.Client) error {
 		description  string
 		variableType string
 	}{
+		// List of your dataset fields as event variables
 		{
-			name:         "ip_address",
+			name:         "transaction_id",
 			dataType:     types.DataTypeString,
 			defaultValue: "",
-			description:  "IP address of the user",
-			variableType: "IP_ADDRESS",
+			description:  "Unique identifier for the transaction",
+			variableType: "SESSION_ID", // Corrected to String
+		},
+		{
+			name:         "account_id",
+			dataType:     types.DataTypeString,
+			defaultValue: "",
+			description:  "Unique identifier for the account",
+			variableType: "USERAGENT", // Corrected to String
 		},
 		{
 			name:         "transaction_amount",
 			dataType:     types.DataTypeFloat,
 			defaultValue: "0.0",
 			description:  "Amount of the transaction",
-			variableType: "NUMERIC",
+			variableType: "PRICE", // Corrected to Numeric
 		},
 		{
-			name:         "email_address",
+			name:         "transaction_date",
 			dataType:     types.DataTypeString,
 			defaultValue: "",
-			description:  "Email address of the user",
-			variableType: "EMAIL_ADDRESS",
+			description:  "Date when the transaction occurred",
+			variableType: "FREE_FORM_TEXT", // Corrected to String
 		},
+		{
+			name:         "transaction_type",
+			dataType:     types.DataTypeString,
+			defaultValue: "",
+			description:  "Type of the transaction (e.g., purchase, refund)",
+			variableType: "PAYMENT_TYPE", // Corrected to String
+		},
+		{
+			name:         "location",
+			dataType:     types.DataTypeString,
+			defaultValue: "",
+			description:  "Location of the transaction",
+			variableType: "BILLING_CITY", // Corrected to String
+		},
+		// {
+		// 	name:         "device_id",
+		// 	dataType:     types.DataTypeString,
+		// 	defaultValue: "",
+		// 	description:  "Device ID used for the transaction",
+		// 	variableType: "String", // Corrected to String
+		// },
+		{
+			name:         "ip_address",
+			dataType:     types.DataTypeString,
+			defaultValue: "",
+			description:  "IP address of the user initiating the transaction",
+			variableType: "BILLING_CITY", // Corrected to String
+		},
+		// {
+		// 	name:         "merchant_id",
+		// 	dataType:     types.DataTypeString,
+		// 	defaultValue: "",
+		// 	description:  "ID of the merchant involved in the transaction",
+		// 	variableType: "String", // Corrected to String
+		// },
+		// {
+		// 	name:         "channel",
+		// 	dataType:     types.DataTypeString,
+		// 	defaultValue: "",
+		// 	description:  "Channel through which the transaction was made",
+		// 	variableType: "String", // Corrected to String
+		// },
+		// {
+		// 	name:         "customer_age",
+		// 	dataType:     types.DataTypeInteger,
+		// 	defaultValue: "0",
+		// 	description:  "Age of the customer making the transaction",
+		// 	variableType: "NUMERIC", // Corrected to Numeric
+		// },
+		// {
+		// 	name:         "customer_occupation",
+		// 	dataType:     types.DataTypeString,
+		// 	defaultValue: "",
+		// 	description:  "Occupation of the customer",
+		// 	variableType: "String", // Corrected to String
+		// },
+		{
+			name:         "transaction_duration",
+			dataType:     types.DataTypeFloat,
+			defaultValue: "0.0",
+			description:  "Duration of the transaction",
+			variableType: "NUMERIC", // Corrected to Numeric
+		},
+		// {
+		// 	name:         "login_attempts",
+		// 	dataType:     types.DataTypeInteger,
+		// 	defaultValue: "0",
+		// 	description:  "Number of login attempts before the transaction",
+		// 	variableType: "NUMERIC", // Corrected to Numeric
+		// },
+		{
+			name:         "account_balance",
+			dataType:     types.DataTypeFloat,
+			defaultValue: "0.0",
+			description:  "Balance of the customer's account at the time of transaction",
+			variableType: "NUMERIC", // Corrected to Numeric
+		},
+		// {
+		// 	name:         "previous_transaction_date",
+		// 	dataType:     types.DataTypeString,
+		// 	defaultValue: "",
+		// 	description:  "Date of the previous transaction",
+		// 	variableType: "String", // Corrected to String
+		// },
+		{
+			name:         "phone_number",
+			dataType:     types.DataTypeString,
+			defaultValue: "",
+			description:  "Phone number of the customer",
+			variableType: "PHONE_NUMBER", // Corrected to String
+		},
+		{
+			name:         "email",
+			dataType:     types.DataTypeString,
+			defaultValue: "",
+			description:  "Email address of the customer",
+			variableType: "EMAIL_ADDRESS", // Corrected to String
+		},
+		// {
+		// 	name:         "transaction_status",
+		// 	dataType:     types.DataTypeString,
+		// 	defaultValue: "",
+		// 	description:  "Status of the transaction (e.g., successful, failed)",
+		// 	variableType: "String", // Corrected to String
+		// },
 	}
 
 	for _, v := range variables {
@@ -129,18 +242,30 @@ func CreateEventVariables(client *frauddetector.Client) error {
 	return nil
 }
 
-// CreateEventType creates an event type for fraud detection.
 func CreateEventType(client *frauddetector.Client) {
 	_, err := client.PutEventType(context.TODO(), &frauddetector.PutEventTypeInput{
-		Name:           aws.String("transaction_event"),
-		EntityTypes:    []string{"customer"},
-		EventVariables: []string{"ip_address", "transaction_amount", "email_address"},
-		Labels:         []string{"fraud", "legit"},
+		Name: aws.String("transaction_event"),
+		EventVariables: []string{
+			"ip_address",         // keep this from original
+			"transaction_amount", // keep this from original
+			"email_address",
+			"transaction_id", "account_id", "transaction_date", "transaction_type", "location", "transaction_duration", "account_balance", "phone_number", "email",
+
+			// "TransactionID", "AccountID", "TransactionAmount", "TransactionDate",
+			// "TransactionType", "Location", "DeviceID", "IP Address", "MerchantID",
+			// "Channel", "CustomerAge", "CustomerOccupation", "TransactionDuration",
+			// "LoginAttempts", "AccountBalance", "PreviousTransactionDate",
+			// "Phone Number", "Email", "TransactionStatus",
+		},
+		EntityTypes: []string{"customer"},                 // Make sure this matches your defined entity
+		Labels:      []string{"fraud", "legit", "0", "1"}, // Add this line to associate labels
+		Tags:        []types.Tag{},
+		// Optional: add Description, Inline, EventIngested, etc.
 	})
 	if err != nil {
 		log.Fatalf("Failed to create event type: %v", err)
 	}
-	fmt.Println("Event type created.")
+	fmt.Println("Event type 'transaction_event' created successfully.")
 }
 
 // CreateDetector creates a fraud detector.
