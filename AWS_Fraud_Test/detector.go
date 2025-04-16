@@ -30,11 +30,11 @@ func CreateLabels(client *frauddetector.Client) {
 		description string
 	}{
 		{
-			name:        "1",
+			name:        "fraud",
 			description: "Fraudulent transaction",
 		},
 		{
-			name:        "0",
+			name:        "legit",
 			description: "Legitimate transaction",
 		},
 	}
@@ -250,12 +250,6 @@ func CreateEventType(client *frauddetector.Client) {
 			"transaction_amount", // keep this from original
 			"email_address",
 			"transaction_id", "account_id", "transaction_date", "transaction_type", "location", "transaction_duration", "account_balance", "phone_number", "email",
-
-			// "TransactionID", "AccountID", "TransactionAmount", "TransactionDate",
-			// "TransactionType", "Location", "DeviceID", "IP Address", "MerchantID",
-			// "Channel", "CustomerAge", "CustomerOccupation", "TransactionDuration",
-			// "LoginAttempts", "AccountBalance", "PreviousTransactionDate",
-			// "Phone Number", "Email", "TransactionStatus",
 		},
 		EntityTypes: []string{"customer"},                 // Make sure this matches your defined entity
 		Labels:      []string{"fraud", "legit", "0", "1"}, // Add this line to associate labels

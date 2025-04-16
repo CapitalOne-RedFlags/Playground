@@ -26,7 +26,7 @@ func ActivateModel(client *frauddetector.Client) {
 	}
 
 	// Print out the status to understand what you're receiving
-	fmt.Printf("Model status: %v\n", statusResp.Status)
+	fmt.Printf("Model status: %+v\n", statusResp.Status)
 
 	// Only activate if status is TRAINING_COMPLETE
 	if statusResp.Status == aws.String("TRAINING_COMPLETE") {
@@ -41,6 +41,6 @@ func ActivateModel(client *frauddetector.Client) {
 		}
 		fmt.Println("Model activated successfully.")
 	} else {
-		fmt.Printf("Model is not in 'TRAINING_COMPLETE' status, current status: %v\n", statusResp.Status)
+		fmt.Printf("Model is not in 'TRAINING_COMPLETE' status, current status: %+v\n", statusResp.Status)
 	}
 }

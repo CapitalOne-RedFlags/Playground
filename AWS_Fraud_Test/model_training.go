@@ -22,8 +22,8 @@ func TrainModel(client *frauddetector.Client) {
 		TrainingDataSchema: &types.TrainingDataSchema{
 			LabelSchema: &types.LabelSchema{
 				LabelMapper: map[string][]string{
-					"FRAUD": {"1"},
-					"LEGIT": {"0"},
+					"FRAUD": {"FRAUD"},
+					"LEGIT": {"LEGIT"},
 				},
 				UnlabeledEventsTreatment: types.UnlabeledEventsTreatmentIgnore,
 			},
@@ -79,11 +79,7 @@ func describeModelVersion(client *frauddetector.Client, modelID, version string)
 		fmt.Println("🔍 Model Version Details:")
 		fmt.Printf("- Version: %s\n", aws.ToString(mv.ModelVersionNumber))
 		fmt.Printf("- Status: %s\n", aws.ToString(mv.Status))
-		if mv.ExternalEventsDetail != nil {
-			fmt.Printf("- Status Reason: %s\n", aws.ToString(mv.ExternalEventsDetail.DataLocation))
-		} else {
-			fmt.Println("- Status Reason: None")
-		}
+		fmt.Printf("- ARN: %s\n", aws.ToString(mv.Arn))
 		fmt.Printf("- Training Data Source: %s\n", mv.TrainingDataSource)
 		if mv.ExternalEventsDetail != nil {
 			fmt.Printf("- Data Location: %s\n", aws.ToString(mv.ExternalEventsDetail.DataLocation))

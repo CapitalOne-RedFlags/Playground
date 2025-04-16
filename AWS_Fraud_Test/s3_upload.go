@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/frauddetector"
@@ -35,17 +36,12 @@ func UploadToS3(bucket, key, filePath string) {
 	fmt.Println("File uploaded to S3 successfully.")
 }
 
-func ImportEventsFromS3(client *frauddetector.Client, bucketName, fileName string) {
-	// Generate a unique JobId
+func ImportEventsFromS3(client *frauddetector.Client, bucketName, fileName string) string {
 	jobId := uuid.New().String()
 
-	// Define the OutputPath (this is where the result of the import job will be saved)
 	outputPath := fmt.Sprintf("s3://%s/output/%s", bucketName, jobId)
+	iamRoleArn := "arn:aws:iam::920373029279:role/service-role/AmazonFraudDetector-DataAccessRole-1741553443122"
 
-	// Specify the IAM Role ARN (you need to create this role in your AWS account if it doesn't exist)
-	iamRoleArn := "arn:aws:iam::123456789012:role/MyFraudDetectorRole" // Update with the correct IAM Role ARN
-
-	// Set up import job for S3 CSV file
 	_, err := client.CreateBatchImportJob(context.TODO(), &frauddetector.CreateBatchImportJobInput{
 		EventTypeName: aws.String("transaction_event"),
 		InputPath:     aws.String(fmt.Sprintf("s3://%s/%s", bucketName, fileName)),
@@ -57,4 +53,33 @@ func ImportEventsFromS3(client *frauddetector.Client, bucketName, fileName strin
 		log.Fatalf("failed to create batch import job: %v", err)
 	}
 	fmt.Println("Batch import job created successfully.")
+	return jobId
+}
+
+func WaitForBatchImportJobCompletion(client *frauddetector.Client, jobId string) {
+	for {
+		resp, err := client.GetBatchImportJobs(context.TODO(), &frauddetector.GetBatchImportJobsInput{
+			JobId: aws.String(jobId),
+		})
+		if err != nil {
+			log.Fatalf("Failed to get batch import job status: %v", err)
+		}
+
+		if len(resp.BatchImports) == 0 {
+			log.Fatalf("No batch import jobs found with JobId %s", jobId)
+		}
+
+		status := resp.BatchImports[0].Status
+		fmt.Println("Batch Import Job Status:", status)
+
+		if status == "COMPLETE" {
+			fmt.Println("Import job completed successfully.")
+			break
+		} else if status == "FAILED" {
+			log.Fatalf("Import job failed: %v", aws.ToString(resp.BatchImports[0].FailureReason))
+
+		}
+
+		time.Sleep(10 * time.Second) // Wait before checking again
+	}
 }
