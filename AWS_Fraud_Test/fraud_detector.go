@@ -13,7 +13,7 @@ import (
 // CreateModel registers a new fraud detection model.
 // CreateModel creates a model if it doesn't exist
 func CreateModel(client *frauddetector.Client) {
-	modelID := "fraud_model"
+	modelID := "fraud_model_v2"
 
 	// First check if model already exists
 	existingModels, err := client.GetModels(context.TODO(), &frauddetector.GetModelsInput{})
@@ -33,7 +33,7 @@ func CreateModel(client *frauddetector.Client) {
 		ModelId:       aws.String(modelID),
 		ModelType:     types.ModelTypeEnumTransactionFraudInsights,
 		EventTypeName: aws.String("transaction_event"),
-		Description:   aws.String("Fraud detection model for transactions"),
+		Description:   aws.String("Fraud detection model for transactions with enhanced variables"),
 	})
 	if err != nil {
 		log.Fatalf("Failed to create model: %v", err)

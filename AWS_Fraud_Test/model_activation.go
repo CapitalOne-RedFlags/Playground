@@ -12,7 +12,7 @@ import (
 
 // ActivateModel deploys and activates the model if it's in TRAINING_COMPLETE status.
 func ActivateModel(client *frauddetector.Client) {
-	modelID := "fraud_model"
+	modelID := "fraud_model_v2"
 	modelVersion := "1.0"
 
 	// Check model version status

@@ -13,7 +13,7 @@ import (
 
 // TrainModel starts model training and waits for it to complete.
 func TrainModel(client *frauddetector.Client) {
-	modelID := "fraud_model"
+	modelID := "fraud_model_v2"
 
 	output, err := client.CreateModelVersion(context.TODO(), &frauddetector.CreateModelVersionInput{
 		ModelId:            aws.String(modelID),
@@ -22,12 +22,23 @@ func TrainModel(client *frauddetector.Client) {
 		TrainingDataSchema: &types.TrainingDataSchema{
 			LabelSchema: &types.LabelSchema{
 				LabelMapper: map[string][]string{
-					"FRAUD": {"FRAUD"},
-					"LEGIT": {"LEGIT"},
+					"FRAUD": {"fraud"},
+					"LEGIT": {"legit"},
 				},
 				UnlabeledEventsTreatment: types.UnlabeledEventsTreatmentIgnore,
 			},
-			ModelVariables: []string{"ip_address", "email_address", "transaction_amount"},
+			ModelVariables: []string{
+				"transaction_amount",
+				"account_balance",
+				"transaction_duration",
+				"transaction_type",
+				"ip_address",
+				"email",
+				"phone_number",
+				"location",
+				"account_id",
+				"transaction_date",
+			},
 		},
 	})
 	if err != nil {
